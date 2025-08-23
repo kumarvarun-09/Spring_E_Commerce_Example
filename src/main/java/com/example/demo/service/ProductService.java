@@ -16,11 +16,11 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public List<Product> getAllProducts(){
+    public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    public Product getProductById(int id){
+    public Product getProductById(int id) {
         return productRepository.findById(id).orElse(null);
     }
 
@@ -35,9 +35,31 @@ public class ProductService {
 //        return productRepository.findById(product.getId()).orElse(null);
     }
 
-    public Image getProductImage(int id){
+    public Image getProductImage(int id) {
         Product product = productRepository.findById(id).orElse(null);
         return (product != null) ? product.getImage() : null;
+    }
+
+    public Product updateProduct(Product product, MultipartFile image) throws IOException {
+        Product existingProduct = productRepository.findById(product.getId()).orElse(null);
+        if (existingProduct == null) {
+            return null;
+        }
+        product.setId(existingProduct.getId());
+        try {
+            product.setImage(new Image(image.getOriginalFilename(), image.getContentType(), image.getBytes()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return productRepository.save(product);
+    }
+
+    public void deleteProduct(int id) {
+        productRepository.deleteById(id);
+    }
+
+    public List<Product> searchProducts(String searchQuery) {
+        return productRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrCategoryContainingIgnoreCase(searchQuery, searchQuery, searchQuery);
     }
 
 }

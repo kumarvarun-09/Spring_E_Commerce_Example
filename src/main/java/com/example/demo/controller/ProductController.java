@@ -21,7 +21,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/getProducts")
-    public ResponseEntity<List<Product>> getAllProducts(){
+    public ResponseEntity<List<Product>> getAllProducts() {
         return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
     }
 //    @RequestMapping("/getProducts")
@@ -30,7 +30,7 @@ public class ProductController {
 //    }
 
     @GetMapping("/getProduct/byId/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable("id") int id){
+    public ResponseEntity<Product> getProductById(@PathVariable("id") int id) {
         Product product = productService.getProductById(id);
         HttpStatus httpStatus = (product != null) ? HttpStatus.OK : HttpStatus.NOT_FOUND;
         return new ResponseEntity<>(product, httpStatus);
@@ -44,12 +44,39 @@ public class ProductController {
     }
 
     @PostMapping("/product")
-    public ResponseEntity<?> addProduct(@RequestPart Product product, @RequestPart MultipartFile image){
+    public ResponseEntity<?> addProduct(@RequestPart Product product, @RequestPart MultipartFile image) {
         try {
             Product addedProduct = productService.addProduct(product, image);
             return new ResponseEntity<>(addedProduct, HttpStatus.CREATED);
         } catch (IOException e) {
             return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PutMapping("/product/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable int id, @RequestPart Product product, @RequestPart MultipartFile image) {
+        try {
+            product.setId(id);
+            Product updatedProduct = productService.updateProduct(product, image);
+            HttpStatus status = updatedProduct != null ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+            return new ResponseEntity<>(updatedProduct, status);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/product/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable(name = "id") int id) {
+        Product product = productService.getProductById(id);
+        if (product == null) {
+            return new ResponseEntity<>("Product not found!", HttpStatus.NOT_FOUND);
+        }
+        productService.deleteProduct(id);
+        return new ResponseEntity<>("Deleted!", HttpStatus.OK);
+    }
+
+    @GetMapping("/product/search")
+    public ResponseEntity<?> searchProducts(@RequestParam String query) {
+        return new ResponseEntity<>(productService.searchProducts(query), HttpStatus.OK);
     }
 }
