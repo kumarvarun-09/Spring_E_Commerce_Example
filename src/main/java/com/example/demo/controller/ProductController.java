@@ -79,4 +79,14 @@ public class ProductController {
     public ResponseEntity<?> searchProducts(@RequestParam String query) {
         return new ResponseEntity<>(productService.searchProducts(query), HttpStatus.OK);
     }
+
+    @GetMapping("/getException")
+    public void getException() {
+        // This method is made to test the AfterThrowing functionality of Aspect Oriented Programming (AOP)
+        try {
+            productService.getException();
+        } catch (Exception e) {
+
+        }
+    }
 }

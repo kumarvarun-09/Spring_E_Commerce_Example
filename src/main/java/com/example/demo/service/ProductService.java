@@ -62,4 +62,8 @@ public class ProductService {
         return productRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrCategoryContainingIgnoreCase(searchQuery, searchQuery, searchQuery);
     }
 
+    public String getException() throws Exception {
+        // This method is made to test the AfterThrowing functionality of Aspect Oriented Programming (AOP)
+        throw new Exception();
+    }
 }
